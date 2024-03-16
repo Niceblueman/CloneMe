@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.png" alt="Icon" width="150" height="150">
+  <img src="../icon.png" alt="Icon" width="150" height="150">
 </p>
 
 <h1 align="center">🤖 My WhatsApp Assistant</h1>
@@ -23,8 +23,8 @@
 ## 📷 Screenshots
 
 <p align="center">
-  <img src="Screen1.png" alt="Screenshot 1" width="400">
-  <img src="Screen2.png" alt="Screenshot 2" width="400">
+  <img src="../Screen1.png" alt="Screenshot 1" width="400">
+  <img src="../Screen2.png" alt="Screenshot 2" width="400">
 </p>
 
 ## 🛠️ Installation
