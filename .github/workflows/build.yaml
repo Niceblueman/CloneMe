@@ -22,6 +22,9 @@ jobs:
       - name: Install Fyne
         run: go install fyne.io/fyne/v2/cmd/fyne@latest
 
+      - name: Install depends
+        run: go mod tidy
+
       - name: Build macOS version
         run: fyne package -os darwin -icon icon.png
 
