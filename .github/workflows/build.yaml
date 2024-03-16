@@ -7,7 +7,21 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          - name: Ubuntu
+            value: ubuntu-latest
+            extension: tar.gz
+          - name: macOS
+            value: macos-latest
+            extension: app
+          - name: Windows
+            value: windows-latest
+            extension: zip
+        go-version: ["1.20"]
 
     steps:
       - name: Checkout repository
@@ -16,7 +30,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: "1.20" # Or specify your desired Go version
+          go-version: ${{ matrix.go-version }}
         id: go
 
       - name: Install Fyne
@@ -25,14 +39,8 @@ jobs:
       - name: Install depends
         run: go mod tidy
 
-      - name: Build macOS version
-        run: fyne package -os darwin -icon icon.png
-
-      - name: Build Linux version
-        run: fyne package -os linux -icon icon.png
-
-      - name: Build Windows version
-        run: fyne package -os windows -icon icon.png
+      - name: Build
+        run: fyne package -os ${{ matrix.os.name }} -icon icon.png
 
       - name: Delete Existing Release
         run: |
@@ -55,32 +63,12 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload macOS Release Asset
+      - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./CloneMe.app
-          asset_name: CloneMe-macos-v1.0.0.app
-          asset_content_type: application/zip
-
-      - name: Upload Linux Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./CloneMe.tar.gz
-          asset_name: app-linux-v1.0.0.tar.gz
-          asset_content_type: application/zip
-
-      - name: Upload Windows Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./CloneMe.zip
-          asset_name: app-windows-v1.0.0.zip
+          asset_path: ./CloneMe.${{ matrix.os.extension }}
+          asset_name: CloneMe-${{ matrix.os.name }}-v1.0.0.${{ matrix.os.extension }}
           asset_content_type: application/zip
