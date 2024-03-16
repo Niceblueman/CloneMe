@@ -1,0 +1,83 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main # Adjust the branch name if needed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "1.16" # Or specify your desired Go version
+        id: go
+
+      - name: Install Fyne
+        run: go install fyne.io/fyne/v2/cmd/fyne@latest
+
+      - name: Build macOS version
+        run: fyne package -os darwin -icon icon.png
+
+      - name: Build Linux version
+        run: fyne package -os linux -icon icon.png
+
+      - name: Build Windows version
+        run: fyne package -os windows -icon icon.png
+
+      - name: Delete Existing Release
+        run: |
+          TAG_NAME="v1.0.0"  # Specify your desired tag version
+          RELEASE_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$TAG_NAME" | jq -r '.id')
+          if [ "$RELEASE_ID" != "null" ]; then
+            curl -X DELETE -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
+          fi
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v1.0.0 # Specify your desired tag version
+          release_name: Release v1.0.0 # Specify your desired release name
+          body: |
+            Describe your release here
+          draft: false
+          prerelease: false
+
+      - name: Upload macOS Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./CloneMe.app
+          asset_name: CloneMe-macos-v1.0.0.app
+          asset_content_type: application/zip
+
+      - name: Upload Linux Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./CloneMe.tar.gz
+          asset_name: app-linux-v1.0.0.tar.gz
+          asset_content_type: application/zip
+
+      - name: Upload Windows Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./CloneMe.zip
+          asset_name: app-windows-v1.0.0.zip
+          asset_content_type: application/zip

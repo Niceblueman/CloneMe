@@ -1,0 +1,8 @@
+Website = "https://cloneme.dup.comany"
+
+[Details]
+  Icon = "Icon.icns"
+  Name = "CloneMe"
+  ID = "company.dup.cloneme"
+  Version = "1.0.0"
+  Build = 8
