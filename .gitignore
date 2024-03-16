@@ -1,5 +1,7 @@
-./data
-./jsonl
+./data/
+./jsonl/
 .env
 *.db
 CloneMe.*
+data/Configs
+jsonl/Message
