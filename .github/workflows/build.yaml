@@ -16,7 +16,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: "1.16" # Or specify your desired Go version
+          go-version: "1.20" # Or specify your desired Go version
         id: go
 
       - name: Install Fyne
